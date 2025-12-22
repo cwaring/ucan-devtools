@@ -1,0 +1,35 @@
+catalogMode: prefer
+
+ignoreWorkspaceRootCheck: true
+
+shellEmulator: true
+
+trustPolicy: no-downgrade
+catalogs:
+  cli:
+    '@antfu/eslint-config': ^6.7.3
+    '@antfu/ni': ^28.0.0
+    bumpp: ^10.3.2
+    eslint: ^9.39.2
+    lint-staged: ^16.2.7
+    publint: ^0.3.16
+    simple-git-hooks: ^2.13.1
+    typescript: ^5.9.3
+  dev:
+    '@wxt-dev/module-vue': ^1.0.3
+    vue-tsc: ^3.2.1
+    wxt: ^0.20.13
+  frontend:
+    vue: ^3.5.26
+  testing:
+    tinyexec: ^1.0.2
+    vitest: ^4.0.16
+    vitest-package-exports: ^1.1.1
+    yaml: ^2.8.2
+  types:
+    '@types/node': ^25.0.3
+ignoredBuiltDependencies:
+  - spawn-sync
+onlyBuiltDependencies:
+  - esbuild
+  - simple-git-hooks
