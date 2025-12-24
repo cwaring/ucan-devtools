@@ -1,0 +1,4 @@
+@source "./**/*.{vue,ts,tsx,js,jsx,html}";
+
+/* Reuse the app's Tailwind theme and layers */
+@import "../src/styles/tailwind.css";
