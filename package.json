@@ -47,7 +47,6 @@
     "tw-animate-css": "catalog:dev",
     "typescript": "catalog:cli",
     "vitest": "catalog:testing",
-    "vitest-package-exports": "catalog:testing",
     "vue-tsc": "catalog:dev",
     "wxt": "catalog:dev",
     "yaml": "catalog:testing"

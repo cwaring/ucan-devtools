@@ -1,11 +1,6 @@
 import { defineConfig } from 'vitest/config'
+import { WxtVitest } from 'wxt/testing/vitest-plugin'
 
 export default defineConfig({
-  test: {
-    server: {
-      deps: {
-        inline: ['vitest-package-exports'],
-      },
-    },
-  },
+  plugins: [WxtVitest()],
 })
