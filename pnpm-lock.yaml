@@ -34,6 +34,9 @@ catalogs:
     '@tailwindcss/vite':
       specifier: ^4.1.18
       version: 4.1.18
+    '@vitejs/plugin-vue':
+      specifier: ^6.0.3
+      version: 6.0.3
     '@wxt-dev/module-vue':
       specifier: ^1.0.3
       version: 1.0.3
@@ -43,6 +46,9 @@ catalogs:
     tw-animate-css:
       specifier: ^1.4.0
       version: 1.4.0
+    vite:
+      specifier: ^7.3.0
+      version: 7.3.0
     vue-tsc:
       specifier: ^3.2.1
       version: 3.2.1
@@ -142,6 +148,9 @@ importers:
       '@types/pako':
         specifier: catalog:types
         version: 2.0.4
+      '@vitejs/plugin-vue':
+        specifier: catalog:dev
+        version: 6.0.3(vite@7.3.0(@types/node@25.0.3)(jiti@2.6.1)(lightningcss@1.30.2)(yaml@2.8.2))(vue@3.5.26(typescript@5.9.3))
       '@wxt-dev/module-vue':
         specifier: catalog:dev
         version: 1.0.3(vite@7.3.0(@types/node@25.0.3)(jiti@2.6.1)(lightningcss@1.30.2)(yaml@2.8.2))(vue@3.5.26(typescript@5.9.3))(wxt@0.20.13(@types/node@25.0.3)(jiti@2.6.1)(lightningcss@1.30.2)(rollup@4.54.0)(yaml@2.8.2))
@@ -172,6 +181,9 @@ importers:
       typescript:
         specifier: catalog:cli
         version: 5.9.3
+      vite:
+        specifier: catalog:dev
+        version: 7.3.0(@types/node@25.0.3)(jiti@2.6.1)(lightningcss@1.30.2)(yaml@2.8.2)
       vitest:
         specifier: catalog:testing
         version: 4.0.16(@types/node@25.0.3)(jiti@2.6.1)(lightningcss@1.30.2)(yaml@2.8.2)

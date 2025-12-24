@@ -1,14 +1,20 @@
 <script setup lang="ts">
 import type { TokenItem } from './capture'
+import { RotateCcw } from 'lucide-vue-next'
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { Badge } from '@/components/ui/badge'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { captureFromRequest } from './capture'
 
 const items = ref<TokenItem[]>([])
+
+function resetRequests() {
+  items.value = []
+}
 
 function truncate(s: string, n = 24) {
   return s.length > n ? `${s.slice(0, n)}…` : s
@@ -53,6 +59,11 @@ onMounted(() => {
         <CardDescription>
           Monitoring UCAN headers (Authorization: Bearer, ucans) captured from network requests.
         </CardDescription>
+        <CardAction>
+          <Button variant="ghost" size="icon" title="Clear all requests" @click="resetRequests">
+            <RotateCcw class="size-4" />
+          </Button>
+        </CardAction>
       </CardHeader>
       <Separator />
       <CardContent class="space-y-4">
@@ -68,7 +79,7 @@ onMounted(() => {
               <TableHead>Type</TableHead>
               <TableHead>Spec Version</TableHead>
               <TableHead>URL</TableHead>
-              <TableHead class="text-right">
+              <TableHead class="text-center">
                 Actions
               </TableHead>
             </TableRow>
@@ -123,8 +134,10 @@ onMounted(() => {
               <TableCell class="truncate max-w-[18rem]">
                 {{ item.url }}
               </TableCell>
-              <TableCell class="text-right">
-                <a class="inline-flex items-center text-sm underline" :href="inspectUrl(item.token)" target="_blank">Inspect</a>
+              <TableCell class="flex justify-end items-center gap-2">
+                <Button variant="outline" size="sm" as-child>
+                  <a :href="inspectUrl(item.token)" target="_blank">Inspect</a>
+                </Button>
               </TableCell>
             </TableRow>
             <TableRow v-if="items.length === 0">
