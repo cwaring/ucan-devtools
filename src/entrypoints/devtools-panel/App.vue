@@ -66,6 +66,7 @@ onMounted(() => {
               <TableHead>Header</TableHead>
               <TableHead>Format</TableHead>
               <TableHead>Type</TableHead>
+              <TableHead>Spec Version</TableHead>
               <TableHead>URL</TableHead>
               <TableHead class="text-right">
                 Actions
@@ -99,9 +100,25 @@ onMounted(() => {
                 </Badge>
               </TableCell>
               <TableCell>
-                <Badge :variant="item.tokenType === 'invocation' ? 'default' : item.tokenType === 'delegation' ? 'outline' : 'secondary'">
+                <Badge
+                  :variant="
+                    item.tokenType === 'invocation' ? 'default'
+                    : item.tokenType === 'delegation' ? 'outline'
+                      : item.tokenType === 'revocation' ? 'destructive'
+                        : item.tokenType === 'promise' ? 'default'
+                          : 'secondary'
+                  "
+                >
                   {{ item.tokenType }}
                 </Badge>
+              </TableCell>
+              <TableCell>
+                <span v-if="item.specVersion" class="font-mono text-xs text-muted-foreground">
+                  {{ item.specVersion }}
+                </span>
+                <span v-else class="text-xs text-muted-foreground">
+                  —
+                </span>
               </TableCell>
               <TableCell class="truncate max-w-[18rem]">
                 {{ item.url }}
@@ -111,7 +128,7 @@ onMounted(() => {
               </TableCell>
             </TableRow>
             <TableRow v-if="items.length === 0">
-              <TableCell colspan="6" class="text-center text-sm text-muted-foreground">
+              <TableCell colspan="7" class="text-center text-sm text-muted-foreground">
                 No UCAN headers captured yet.
               </TableCell>
             </TableRow>

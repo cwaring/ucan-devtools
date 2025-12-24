@@ -1,3 +1,4 @@
+import * as cborg from 'cborg'
 import { containerDecoder } from '@/utils/container'
 import { composeDecoders } from '@/utils/decoders'
 import { rawTokenDecoder } from '@/utils/raw-token'
@@ -8,34 +9,80 @@ export interface TokenItem {
   header: 'Authorization' | 'ucans'
   capturedAt: number
   format: 'container' | 'raw'
-  tokenType: 'delegation' | 'invocation' | 'unknown'
+  tokenType: 'delegation' | 'invocation' | 'revocation' | 'promise' | 'unknown'
+  specVersion?: string // UCAN spec version (e.g., '1.0.0-rc.1')
 }
 
 const decoder = composeDecoders([containerDecoder, rawTokenDecoder])
 
-function decodeJWT(token: string): any {
-  try {
-    const parts = token.split('.')
-    if (parts.length !== 3)
-      return null
-    const payload = parts[1]
-    const decoded = atob(payload.replace(/-/g, '+').replace(/_/g, '/'))
-    return JSON.parse(decoded)
-  }
-  catch {
-    return null
-  }
+export const UCAN_TYPE_TAG_PATTERN = /ucan\/(dlg|inv|rev|prm)@([\d.a-z-]+)/i
+
+export const TYPE_ABBREVIATION_MAP: Record<string, 'delegation' | 'invocation' | 'revocation' | 'promise'> = {
+  dlg: 'delegation',
+  inv: 'invocation',
+  rev: 'revocation',
+  prm: 'promise',
 }
 
-function detectTokenType(token: string): 'delegation' | 'invocation' | 'unknown' {
-  const payload = decodeJWT(token)
-  if (!payload)
-    return 'unknown'
-  // Invocation tokens have nnc (nonce), cmd (command), and sub (subject)
-  if (payload.nnc && payload.cmd && payload.sub)
-    return 'invocation'
-  // Delegation tokens typically have att (attenuation) or prf (proof)
-  return 'delegation'
+interface TokenTypeInfo {
+  type: 'delegation' | 'invocation' | 'revocation' | 'promise' | 'unknown'
+  version?: string
+}
+
+export function extractTypeFromTag(typeTag: string): TokenTypeInfo {
+  const match = typeTag.match(UCAN_TYPE_TAG_PATTERN)
+  if (!match)
+    return { type: 'unknown' }
+
+  const typeAbbr = match[1].toLowerCase()
+  const version = match[2]
+  const mappedType = TYPE_ABBREVIATION_MAP[typeAbbr]
+
+  return mappedType ? { type: mappedType, version } : { type: 'unknown' }
+}
+
+function detectTokenType(token: string): TokenTypeInfo {
+  try {
+    // Try to decode as base64 CBOR envelope
+    // Use atob for browser-compatible base64 decoding
+    const binaryString = atob(token)
+    const bytes = Uint8Array.from(binaryString, c => c.charCodeAt(0))
+
+    // Decode CBOR envelope: [signature, payload]
+    let decoded: any
+    try {
+      decoded = cborg.decode(bytes)
+    }
+    catch {
+      // If CBOR parsing fails, try to extract type tag from binary text
+      const typeTagMatch = binaryString.match(UCAN_TYPE_TAG_PATTERN)
+      if (typeTagMatch) {
+        return extractTypeFromTag(binaryString)
+      }
+      throw new Error('Could not decode CBOR')
+    }
+
+    // UCAN tokens are CBOR arrays with [signature, payload]
+    if (Array.isArray(decoded) && decoded.length === 2) {
+      const payload = decoded[1]
+
+      // Payload should have a string key like 'ucan/dlg@1.0.0-rc.1'
+      if (typeof payload === 'object' && payload !== null) {
+        // Find UCAN type tag key in the payload
+        for (const key in payload) {
+          if (UCAN_TYPE_TAG_PATTERN.test(key)) {
+            return extractTypeFromTag(key)
+          }
+        }
+      }
+    }
+  }
+  catch {
+    // Not a valid CBOR token, only UCAN 1.0 CBOR is supported
+    return { type: 'unknown' }
+  }
+
+  return { type: 'unknown' }
 }
 
 function parseUcansHeader(value: string): string[] {
@@ -46,30 +93,50 @@ function parseUcansHeader(value: string): string[] {
     .filter(Boolean)
 }
 
+function createTokenItem(
+  token: string,
+  originalToken: string,
+  header: 'Authorization' | 'ucans',
+  url: string,
+  capturedAt: number,
+): TokenItem {
+  const typeInfo = detectTokenType(token)
+  return {
+    token,
+    url,
+    header,
+    capturedAt,
+    format: token !== originalToken ? 'container' : 'raw',
+    tokenType: typeInfo.type,
+    specVersion: typeInfo.version,
+  }
+}
+
 export function captureFromRequest(request: Browser.devtools.network.Request | HARFormatEntry): TokenItem[] {
-  const harEntry = request
-  const headers = harEntry.request?.headers ?? []
-  const url = harEntry.request?.url ?? ''
+  const headers = request.request?.headers ?? []
+  const url = request.request?.url ?? ''
   const capturedAt = Date.now()
   const out: TokenItem[] = []
 
   for (const h of headers) {
     const name = h.name.toLowerCase()
+    let tokens: string[] = []
+    let headerType: 'Authorization' | 'ucans' | null = null
+
     if (name === 'authorization' && h.value.startsWith('Bearer ')) {
-      const token = h.value.slice('Bearer '.length)
-      const decoded = decoder.decode(token)
-      for (const t of decoded) {
-        const tokenType = detectTokenType(t)
-        out.push({ token: t, url, header: 'Authorization', capturedAt, format: t !== token ? 'container' : 'raw', tokenType })
-      }
+      tokens = [h.value.slice('Bearer '.length)]
+      headerType = 'Authorization'
     }
     else if (name === 'ucans') {
-      const tokens = parseUcansHeader(h.value)
+      tokens = parseUcansHeader(h.value)
+      headerType = 'ucans'
+    }
+
+    if (headerType) {
       for (const token of tokens) {
-        const decoded = decoder.decode(token)
-        for (const t of decoded) {
-          const tokenType = detectTokenType(t)
-          out.push({ token: t, url, header: 'ucans', capturedAt, format: t !== token ? 'container' : 'raw', tokenType })
+        const decodedTokens = decoder.decode(token)
+        for (const decodedToken of decodedTokens) {
+          out.push(createTokenItem(decodedToken, token, headerType, url, capturedAt))
         }
       }
     }
