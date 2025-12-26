@@ -1,5 +1,5 @@
 {
-  "name": "ucan-devtools",
+  "name": "@ucan-wg/devtools",
   "type": "module",
   "version": "0.0.0",
   "private": true,
