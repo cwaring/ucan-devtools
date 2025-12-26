@@ -13,8 +13,8 @@ import {
 import {
   getUCANPayloadFromEnvelope,
   isUCANDelegationPayload,
+  isUCANEnvelope,
   isUCANInvocationPayload,
-  isUCANToken,
 } from './ucan-guards'
 
 describe('ucan-decoder', () => {
@@ -303,17 +303,17 @@ describe('ucan-decoder', () => {
   })
 
   describe('type guards', () => {
-    it('should narrow UCANToken and extract delegation payload from envelope', () => {
+    it('should narrow UCANEnvelope and extract delegation payload from signature payload', () => {
       // Mock UCAN token from delegation.test.ts
       const token = 'glhA/ynNOVcvmCF24rmT4ZYSVVKiWmeWvOr8RTP7amuL/iyu14oi9HN1RlNkJEshYSVVqTh8YdIqbwZVFcCTU8v4BaJhaEg0Ae0B7QETcXN1Y2FuL2RsZ0AxLjAuMC1yYy4xqWNhdWR4OGRpZDprZXk6ejZNa3ViQ1ZZaFJjcUg0QkR0UDEzendWRTFTcm9xUTU2Z24xeVE1RngyZXBkTVpyY2NtZGsvZGVidWcvZWNob2NleHAaaUvqj2Npc3N4OGRpZDprZXk6ejZNa3dDak1veVJFY1ZEN1ZrN2hCTUNyY1pNWG1pZktKcEhvN2JQb3ExRUVrMk5KY25iZhpiS+f7Y3BvbIBjc3VieDhkaWQ6a2V5Ono2TWt1YkNWWWhSY3FINEJEdFAxM3p3VkUxU3JvcVE1NmduMXlRNUZ4MmVwZE1acmRtZXRhoWRub3RleDNNb2NrIGRlbGVnYXRpb24gZ2VuZXJhdGVkIGxvY2FsbHkgYnkgVUNBTiBJbnNwZWN0b3Jlbm9uY2VMQfDJBlGeGEDSiU60'
 
       const decoded: unknown = decodeUCAN(token)
-      expect(isUCANToken(decoded)).toBe(true)
-      if (!isUCANToken(decoded))
+      expect(isUCANEnvelope(decoded)).toBe(true)
+      if (!isUCANEnvelope(decoded))
         return
 
-      const [, envelope] = decoded
-      const extracted = getUCANPayloadFromEnvelope(envelope)
+      const [, signaturePayload] = decoded
+      const extracted = getUCANPayloadFromEnvelope(signaturePayload)
       expect(extracted).not.toBeNull()
       expect(extracted?.typeTag.startsWith('ucan/dlg@')).toBe(true)
       expect(isUCANDelegationPayload(extracted?.payload)).toBe(true)
@@ -321,6 +321,7 @@ describe('ucan-decoder', () => {
 
     it('should validate invocation payload shape', () => {
       const invocationEnvelope = {
+        'h': new Uint8Array([0x01]),
         'ucan/inv@1.0.0-rc.1': {
           iss: 'did:key:z6MkiTestIssuer',
           sub: 'did:key:z6MkiTestSubject',
@@ -328,6 +329,7 @@ describe('ucan-decoder', () => {
           args: { hello: 'world' },
           prf: [],
           nonce: new Uint8Array([1, 2, 3]),
+          exp: null,
         },
       }
 
@@ -336,12 +338,12 @@ describe('ucan-decoder', () => {
       const base64 = Buffer.from(encoded).toString('base64')
 
       const decoded: unknown = decodeUCAN(base64)
-      expect(isUCANToken(decoded)).toBe(true)
-      if (!isUCANToken(decoded))
+      expect(isUCANEnvelope(decoded)).toBe(true)
+      if (!isUCANEnvelope(decoded))
         return
 
-      const [, envelope] = decoded
-      const extracted = getUCANPayloadFromEnvelope(envelope)
+      const [, signaturePayload] = decoded
+      const extracted = getUCANPayloadFromEnvelope(signaturePayload)
       expect(extracted).not.toBeNull()
       expect(extracted?.typeTag.startsWith('ucan/inv@')).toBe(true)
       expect(isUCANInvocationPayload(extracted?.payload)).toBe(true)

@@ -12,6 +12,7 @@ export type TokenFormat = 'base64' | 'base64url' | 'hex' | 'raw' | 'bytes'
 
 // Lightweight aliases
 export type DID = string
+export type DIDURL = string
 
 export type CborPrimitive
   = | string
@@ -37,34 +38,75 @@ export type IPLDLink = { '/': string } | { '/': Uint8Array }
  * UCAN payload structures (UCAN 1.0 DAG-CBOR)
  * @see https://github.com/ucan-wg/spec
  */
-export interface UCANDelegationPayload {
-  iss: DID
+export interface UCANPayloadBase {
+  /**
+   * Issuer DID (sender)
+   */
+  iss: DIDURL
+  /**
+   * Audience DID (receiver)
+   */
+  aud?: DID
+  /**
+   * Principal that the chain is about (the Subject)
+   */
+  sub?: DID | null
+  /**
+   * The Command to eventually invoke
+   */
+  cmd: string
+  /**
+   * The nonce of the UCAN
+   */
+  nonce: Uint8Array
+  /**
+   * Meta (asserted, signed data) — is not delegated authority
+   */
+  meta?: Record<string, unknown>
+  /**
+   * Expiration UTC Unix Timestamp in seconds (valid until)
+   */
+  exp: number | null
+  /**
+   * Not before UTC Unix Timestamp in seconds (valid from)
+   */
+  nbf?: number
+}
+
+export interface UCANDelegationPayload extends UCANPayloadBase {
   aud: DID
   sub: DID | null
-  cmd: string
   pol: CborValue
-  exp?: number | null
-  nbf?: number
-  nonce?: Uint8Array
-  meta?: CborObject
 }
 
-export interface UCANInvocationPayload {
-  iss: DID
-  aud?: DID
+export interface UCANInvocationPayload extends UCANPayloadBase {
   sub: DID
-  cmd: string
-  args: CborObject
-  prf: CborValue
-  exp?: number | null
-  nbf?: number
+  /**
+   * Any Arguments that MUST be present in the Invocation
+   */
+  args: Record<string, unknown>
+  /**
+   * Delegations that prove the chain of authority
+   */
+  prf: IPLDLink[]
+  /**
+   * Issued at time
+   */
   iat?: number
-  nonce?: Uint8Array
+  /**
+   * Optional CID-like link to a receipt/task cause
+   */
   cause?: IPLDLink
-  meta?: CborObject
 }
 
-export type UCANPayload = UCANDelegationPayload | UCANInvocationPayload
+export interface UCANPayloadBySpec {
+  dlg: UCANDelegationPayload
+  inv: UCANInvocationPayload
+}
+
+export type UCANPayloadSpec = keyof UCANPayloadBySpec
+
+export type UCANPayload = UCANPayloadBySpec[UCANPayloadSpec]
 
 /**
  * UCAN type tag keys (UCAN 1.0 DAG-CBOR)
@@ -73,24 +115,24 @@ export type UCANPayload = UCANDelegationPayload | UCANInvocationPayload
  * - `ucan/dlg@1.0.0-rc.1`
  * - `ucan/inv@1.0.0-rc.1`
  */
-export type UCANDelegationTypeTag = `ucan/dlg@${string}`
-export type UCANInvocationTypeTag = `ucan/inv@${string}`
-export type UCANTypeTag = UCANDelegationTypeTag | UCANInvocationTypeTag
+export type UCANTypeTag<Spec extends UCANPayloadSpec = UCANPayloadSpec> = `ucan/${Spec}@${string}`
 
-export type UCANPayloadExtractionResult
-  = | { typeTag: UCANDelegationTypeTag, payload: UCANDelegationPayload }
-    | { typeTag: UCANInvocationTypeTag, payload: UCANInvocationPayload }
-
-/**
- * UCAN envelope: an object with a type tag key (e.g. `ucan/dlg@1.0.0-rc.1`)
- * whose value is the payload.
- */
-export type UCANEnvelope = CborObject & Partial<Record<UCANTypeTag, UCANPayload>>
+export type UCANPayloadExtractionResult = {
+  [Spec in UCANPayloadSpec]: {
+    typeTag: UCANTypeTag<Spec>
+    payload: UCANPayloadBySpec[Spec]
+  }
+}[UCANPayloadSpec]
 
 /**
- * UCAN token structure: [signature, envelope]
+ * Signature: contains header `h` and the UCAN payload.
  */
-export type UCANToken = [Uint8Array, UCANEnvelope]
+export type UCANSignaturePayload = CborObject & { h: Uint8Array } & Partial<Record<UCANTypeTag, UCANPayload>>
+
+/**
+ * Envelope: [signature, signaturePayload]
+ */
+export type UCANEnvelope = [Uint8Array, UCANSignaturePayload]
 
 /**
  * Result of UCAN decoding with metadata

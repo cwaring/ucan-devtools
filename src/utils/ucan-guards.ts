@@ -1,12 +1,11 @@
 import type {
   CborObject,
   UCANDelegationPayload,
-  UCANDelegationTypeTag,
   UCANEnvelope,
   UCANInvocationPayload,
-  UCANInvocationTypeTag,
   UCANPayloadExtractionResult,
-  UCANToken,
+  UCANSignaturePayload,
+  UCANTypeTag,
 } from './ucan-types'
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -21,11 +20,16 @@ export function isCborObject(value: unknown): value is CborObject {
   return isRecord(value)
 }
 
-export function isUCANToken(value: unknown): value is UCANToken {
+export function isUCANEnvelope(value: unknown): value is UCANEnvelope {
   return Array.isArray(value)
     && value.length === 2
     && isUint8Array(value[0])
     && isCborObject(value[1])
+    && isUint8Array((value[1] as any).h)
+}
+
+export function isUCANSignaturePayload(value: unknown): value is UCANSignaturePayload {
+  return isCborObject(value) && isUint8Array((value as any).h)
 }
 
 export function isUCANDelegationPayload(value: unknown): value is UCANDelegationPayload {
@@ -41,12 +45,17 @@ export function isUCANDelegationPayload(value: unknown): value is UCANDelegation
   if (typeof value.cmd !== 'string')
     return false
 
-  // Optional fields
-  if (value.exp !== undefined && !(typeof value.exp === 'number' || value.exp === null))
+  if (!isUint8Array(value.nonce))
     return false
+  if (!(typeof value.exp === 'number' || value.exp === null))
+    return false
+  if (value.pol === undefined)
+    return false
+
+  // Optional fields
   if (value.nbf !== undefined && typeof value.nbf !== 'number')
     return false
-  if (value.nonce !== undefined && !isUint8Array(value.nonce))
+  if (value.meta !== undefined && !isRecord(value.meta))
     return false
 
   return true
@@ -68,17 +77,22 @@ export function isUCANInvocationPayload(value: unknown): value is UCANInvocation
     return false
 
   // prf is required; we keep it permissive but present.
-  if (value.prf === undefined)
+  if (!Array.isArray(value.prf))
+    return false
+
+  if (!isUint8Array(value.nonce))
+    return false
+  if (!(typeof value.exp === 'number' || value.exp === null))
     return false
 
   // Optional fields
-  if (value.exp !== undefined && !(typeof value.exp === 'number' || value.exp === null))
-    return false
   if (value.nbf !== undefined && typeof value.nbf !== 'number')
     return false
   if (value.iat !== undefined && typeof value.iat !== 'number')
     return false
-  if (value.nonce !== undefined && !isUint8Array(value.nonce))
+  if (value.cause !== undefined && !isRecord(value.cause))
+    return false
+  if (value.meta !== undefined && !isRecord(value.meta))
     return false
 
   return true
@@ -87,10 +101,10 @@ export function isUCANInvocationPayload(value: unknown): value is UCANInvocation
 export function getUCANPayloadFromEnvelope(
   envelope: unknown,
 ): UCANPayloadExtractionResult | null {
-  if (!isCborObject(envelope))
+  if (!isUCANSignaturePayload(envelope))
     return null
 
-  for (const [key, value] of Object.entries(envelope as UCANEnvelope)) {
+  for (const [key, value] of Object.entries(envelope as UCANSignaturePayload)) {
     if (!key.startsWith('ucan/'))
       continue
 
@@ -99,12 +113,12 @@ export function getUCANPayloadFromEnvelope(
 
     if (key.toLowerCase().startsWith('ucan/dlg@')) {
       if (isUCANDelegationPayload(value))
-        return { typeTag: key as UCANDelegationTypeTag, payload: value }
+        return { typeTag: key as UCANTypeTag<'dlg'>, payload: value }
     }
 
     if (key.toLowerCase().startsWith('ucan/inv@')) {
       if (isUCANInvocationPayload(value))
-        return { typeTag: key as UCANInvocationTypeTag, payload: value }
+        return { typeTag: key as UCANTypeTag<'inv'>, payload: value }
     }
   }
 
