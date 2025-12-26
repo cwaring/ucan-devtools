@@ -1,10 +1,8 @@
 catalogMode: prefer
-
 ignoreWorkspaceRootCheck: true
-
 shellEmulator: true
-
 trustPolicy: no-downgrade
+
 catalogs:
   cli:
     '@antfu/eslint-config': ^6.7.3
@@ -41,8 +39,8 @@ catalogs:
   types:
     '@types/node': ^25.0.3
     '@types/pako': ^2.0.4
-ignoredBuiltDependencies:
-  - spawn-sync
+
 onlyBuiltDependencies:
   - esbuild
+  - spawn-sync
   - simple-git-hooks

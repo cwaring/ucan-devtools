@@ -9,23 +9,21 @@ export interface TokenItem {
   header: 'Authorization' | 'ucans'
   capturedAt: number
   format: 'container' | 'raw'
-  tokenType: 'delegation' | 'invocation' | 'revocation' | 'promise' | 'unknown'
+  tokenType: 'delegation' | 'invocation' | 'unknown'
   specVersion?: string // UCAN spec version (e.g., '1.0.0-rc.1')
 }
 
 const decoder = composeDecoders([containerDecoder, rawTokenDecoder])
 
-export const UCAN_TYPE_TAG_PATTERN = /ucan\/(dlg|inv|rev|prm)@([\d.a-z-]+)/i
+export const UCAN_TYPE_TAG_PATTERN = /ucan\/(dlg|inv)@([\d.a-z-]+)/i
 
-export const TYPE_ABBREVIATION_MAP: Record<string, 'delegation' | 'invocation' | 'revocation' | 'promise'> = {
+export const TYPE_ABBREVIATION_MAP: Record<string, 'delegation' | 'invocation'> = {
   dlg: 'delegation',
   inv: 'invocation',
-  rev: 'revocation',
-  prm: 'promise',
 }
 
 interface TokenTypeInfo {
-  type: 'delegation' | 'invocation' | 'revocation' | 'promise' | 'unknown'
+  type: 'delegation' | 'invocation' | 'unknown'
   version?: string
 }
 

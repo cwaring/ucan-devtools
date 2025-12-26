@@ -10,7 +10,7 @@ import {
 const MOCK_DELEGATION_TOKEN = 'glhA/ynNOVcvmCF24rmT4ZYSVVKiWmeWvOr8RTP7amuL/iyu14oi9HN1RlNkJEshYSVVqTh8YdIqbwZVFcCTU8v4BaJhaEg0Ae0B7QETcXN1Y2FuL2RsZ0AxLjAuMC1yYy4xqWNhdWR4OGRpZDprZXk6ejZNa3ViQ1ZZaFJjcUg0QkR0UDEzendWRTFTcm9xUTU2Z24xeVE1RngyZXBkTVpyY2NtZGsvZGVidWcvZWNob2NleHAaaUvqj2Npc3N4OGRpZDprZXk6ejZNa3dDak1veVJFY1ZEN1ZrN2hCTUNyY1pNWG1pZktKcEhvN2JQb3ExRUVrMk5KY25iZmJLx/tjcG9sY3N1Yng4ZGlkOmtleTp6Nk1rdWJDVlloUmNxSDRCRHRQMTN6d1ZFMVNyb3FRNTZnbjF5UTVGeDJlcGRNWnJkbWV0YaFkbm90ZXgzTW9jayBkZWxlZ2F0aW9uIGdlbmVyYXRlZCBsb2NhbGx5IGJ5IFVDQU4gSW5zcGVjdG9yZW5vbmNlTADwyVFAwk60'
 
 interface TokenTypeInfo {
-  type: 'delegation' | 'invocation' | 'revocation' | 'promise' | 'unknown'
+  type: 'delegation' | 'invocation' | 'unknown'
   version?: string
 }
 
@@ -79,12 +79,10 @@ describe('token type detection', () => {
     const typeTagTests = [
       { abbr: 'dlg', type: 'delegation' },
       { abbr: 'inv', type: 'invocation' },
-      { abbr: 'rev', type: 'revocation' },
-      { abbr: 'prm', type: 'promise' },
     ] as const
 
     it.each(typeTagTests)('should map $abbr to $type', ({ abbr, type }) => {
-      const typeTag = `ucan/${abbr}@1.0.0`
+      const typeTag = `ucan/${abbr}@1.0.0-rc.1`
       expect(extractTypeFromTag(typeTag).type).toBe(type)
     })
 
