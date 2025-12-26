@@ -10,6 +10,13 @@ import {
   UCANDecodeError,
 } from './ucan-decoder'
 
+import {
+  getUCANPayloadFromEnvelope,
+  isUCANDelegationPayload,
+  isUCANInvocationPayload,
+  isUCANToken,
+} from './ucan-guards'
+
 describe('ucan-decoder', () => {
   describe('format detection', () => {
     it('should decode base64-encoded CBOR', () => {
@@ -292,6 +299,65 @@ describe('ucan-decoder', () => {
       expect(ucanPayload).toHaveProperty('aud')
       expect(ucanPayload.iss).toContain('did:key:')
       expect(ucanPayload.aud).toContain('did:key:')
+    })
+  })
+
+  describe('type guards', () => {
+    it('should narrow UCANToken and extract delegation payload from envelope', () => {
+      // Mock UCAN token from delegation.test.ts
+      const token = 'glhA/ynNOVcvmCF24rmT4ZYSVVKiWmeWvOr8RTP7amuL/iyu14oi9HN1RlNkJEshYSVVqTh8YdIqbwZVFcCTU8v4BaJhaEg0Ae0B7QETcXN1Y2FuL2RsZ0AxLjAuMC1yYy4xqWNhdWR4OGRpZDprZXk6ejZNa3ViQ1ZZaFJjcUg0QkR0UDEzendWRTFTcm9xUTU2Z24xeVE1RngyZXBkTVpyY2NtZGsvZGVidWcvZWNob2NleHAaaUvqj2Npc3N4OGRpZDprZXk6ejZNa3dDak1veVJFY1ZEN1ZrN2hCTUNyY1pNWG1pZktKcEhvN2JQb3ExRUVrMk5KY25iZhpiS+f7Y3BvbIBjc3VieDhkaWQ6a2V5Ono2TWt1YkNWWWhSY3FINEJEdFAxM3p3VkUxU3JvcVE1NmduMXlRNUZ4MmVwZE1acmRtZXRhoWRub3RleDNNb2NrIGRlbGVnYXRpb24gZ2VuZXJhdGVkIGxvY2FsbHkgYnkgVUNBTiBJbnNwZWN0b3Jlbm9uY2VMQfDJBlGeGEDSiU60'
+
+      const decoded: unknown = decodeUCAN(token)
+      expect(isUCANToken(decoded)).toBe(true)
+      if (!isUCANToken(decoded))
+        return
+
+      const [, envelope] = decoded
+      const extracted = getUCANPayloadFromEnvelope(envelope)
+      expect(extracted).not.toBeNull()
+      expect(extracted?.typeTag.startsWith('ucan/dlg@')).toBe(true)
+      expect(isUCANDelegationPayload(extracted?.payload)).toBe(true)
+    })
+
+    it('should validate invocation payload shape', () => {
+      const invocationEnvelope = {
+        'ucan/inv@1.0.0-rc.1': {
+          iss: 'did:key:z6MkiTestIssuer',
+          sub: 'did:key:z6MkiTestSubject',
+          cmd: 'debug/echo',
+          args: { hello: 'world' },
+          prf: [],
+          nonce: new Uint8Array([1, 2, 3]),
+        },
+      }
+
+      const tokenValue = [new Uint8Array([9, 9, 9]), invocationEnvelope]
+      const encoded = cborg.encode(tokenValue)
+      const base64 = Buffer.from(encoded).toString('base64')
+
+      const decoded: unknown = decodeUCAN(base64)
+      expect(isUCANToken(decoded)).toBe(true)
+      if (!isUCANToken(decoded))
+        return
+
+      const [, envelope] = decoded
+      const extracted = getUCANPayloadFromEnvelope(envelope)
+      expect(extracted).not.toBeNull()
+      expect(extracted?.typeTag.startsWith('ucan/inv@')).toBe(true)
+      expect(isUCANInvocationPayload(extracted?.payload)).toBe(true)
+    })
+
+    it('should reject envelopes with missing required delegation fields', () => {
+      const badEnvelope = {
+        'ucan/dlg@1.0.0-rc.1': {
+          iss: 'did:key:z6MkiTestIssuer',
+          // aud missing
+          sub: null,
+          cmd: 'debug/echo',
+        },
+      }
+
+      expect(getUCANPayloadFromEnvelope(badEnvelope)).toBeNull()
     })
   })
 })

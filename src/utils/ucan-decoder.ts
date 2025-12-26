@@ -1,3 +1,5 @@
+import type { DecodeResult, TokenFormat } from './ucan-types'
+
 import * as cborg from 'cborg'
 import { CID } from 'multiformats/cid'
 
@@ -8,32 +10,8 @@ import {
   latin1ToBytes,
 } from './encoding'
 
-/**
- * Token encoding format
- */
-export type TokenFormat = 'base64' | 'base64url' | 'hex' | 'raw' | 'bytes'
-
-/**
- * UCAN payload structure based on spec
- * @see https://github.com/ucan-wg/spec
- */
-export interface UCANPayload {
-  iss: string // issuer DID
-  aud: string // audience DID
-  sub?: string // subject DID
-  cmd?: string // command/capability path
-  pol?: unknown[] // policy (proof chain)
-  exp?: number // expiration timestamp
-  nbf?: number // not before timestamp
-  nnc?: string // nonce
-  meta?: Record<string, unknown> // metadata
-  [key: string]: unknown // type tag (e.g., 'ucan/dlg@1.0.0-rc.1') + other fields
-}
-
-/**
- * UCAN token structure: [signature, payload]
- */
-export type UCANToken = [Uint8Array, UCANPayload]
+export * from './ucan-guards'
+export * from './ucan-types'
 
 /**
  * Custom error for UCAN decoding failures
@@ -49,14 +27,7 @@ export class UCANDecodeError extends Error {
   }
 }
 
-/**
- * Result of UCAN decoding with metadata
- */
-export interface DecodeResult {
-  value: unknown
-  format: TokenFormat
-  size: number
-}
+// DecodeResult is defined in ./ucan-types
 
 /**
  * Decode cache for performance optimization
