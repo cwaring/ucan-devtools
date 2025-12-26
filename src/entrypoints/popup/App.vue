@@ -1,30 +1,47 @@
 <script lang="ts" setup>
-import HelloWorld from '@/components/HelloWorld.vue'
+import Button from '@/components/ui/button/Button.vue'
+import Card from '@/components/ui/card/Card.vue'
+import CardContent from '@/components/ui/card/CardContent.vue'
+import CardDescription from '@/components/ui/card/CardDescription.vue'
+import CardHeader from '@/components/ui/card/CardHeader.vue'
+import CardTitle from '@/components/ui/card/CardTitle.vue'
+
+function closePopup() {
+  window.close()
+}
 </script>
 
 <template>
-  <div>
-    <a href="https://wxt.dev" target="_blank">
-      <img src="/wxt.svg" class="logo" alt="WXT logo">
-    </a>
-    <a href="https://vuejs.org/" target="_blank">
-      <img src="@/assets/vue.svg" class="logo vue" alt="Vue logo">
-    </a>
-  </div>
-  <HelloWorld msg="WXT + Vue" />
-</template>
+  <div class="min-h-screen p-4 bg-background text-foreground">
+    <Card class="w-96 shadow-lg">
+      <CardHeader>
+        <CardTitle>UCAN Devtools</CardTitle>
+        <CardDescription>
+          Inspect and debug UCAN tokens
+        </CardDescription>
+      </CardHeader>
+      <CardContent class="space-y-4">
+        <div class="space-y-3">
+          <div class="rounded-lg bg-muted p-4">
+            <h3 class="font-semibold text-sm mb-2">
+              How to use:
+            </h3>
+            <ol class="text-sm text-muted-foreground space-y-1 list-decimal list-inside">
+              <li>Open your browser's Developer Tools (or Inspector)</li>
+              <li>Navigate to the "UCAN Devtools" panel tab</li>
+              <li>Network requests with UCAN tokens will appear automatically</li>
+              <li>Click "Inspect" to view token details</li>
+            </ol>
+          </div>
+        </div>
 
-<style scoped>
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #54bc4ae0);
-}
-.logo.vue:hover {
-  filter: drop-shadow(0 0 2em #42b883aa);
-}
-</style>
+        <Button
+          class="w-full"
+          @click="closePopup"
+        >
+          Got it, close this
+        </Button>
+      </CardContent>
+    </Card>
+  </div>
+</template>
