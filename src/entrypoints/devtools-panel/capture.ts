@@ -1,7 +1,7 @@
-import * as cborg from 'cborg'
 import { containerDecoder } from '@/utils/container'
 import { composeDecoders } from '@/utils/decoders'
 import { rawTokenDecoder } from '@/utils/raw-token'
+import { decodeUCAN } from '@/utils/ucan-decoder'
 
 export interface TokenItem {
   token: string
@@ -41,21 +41,25 @@ export function extractTypeFromTag(typeTag: string): TokenTypeInfo {
 
 function detectTokenType(token: string): TokenTypeInfo {
   try {
-    // Try to decode as base64 CBOR envelope
-    // Use atob for browser-compatible base64 decoding
-    const binaryString = atob(token)
-    const bytes = Uint8Array.from(binaryString, c => c.charCodeAt(0))
-
-    // Decode CBOR envelope: [signature, payload]
     let decoded: any
     try {
-      decoded = cborg.decode(bytes)
+      decoded = decodeUCAN(token)
     }
     catch {
-      // If CBOR parsing fails, try to extract type tag from binary text
-      const typeTagMatch = binaryString.match(UCAN_TYPE_TAG_PATTERN)
+      // If CBOR parsing fails, try to extract type tag from token string
+      // Token might be base64, hex, or raw - try to decode for pattern matching
+      let searchString = token
+      try {
+        const binaryString = atob(token)
+        searchString = binaryString
+      }
+      catch {
+        // Not base64, use token as-is
+      }
+
+      const typeTagMatch = searchString.match(UCAN_TYPE_TAG_PATTERN)
       if (typeTagMatch) {
-        return extractTypeFromTag(binaryString)
+        return extractTypeFromTag(searchString)
       }
       throw new Error('Could not decode CBOR')
     }

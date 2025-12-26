@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { TokenItem } from './capture'
-import * as cborg from 'cborg'
 import { RotateCcw } from 'lucide-vue-next'
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { Badge } from '@/components/ui/badge'
@@ -9,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Separator } from '@/components/ui/separator'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import { decodeUCAN } from '@/utils/ucan-decoder'
 import { captureFromRequest } from './capture'
 
 const items = ref<TokenItem[]>([])
@@ -44,14 +44,13 @@ function decodePayload(token: string): string {
     return payloadCache.get(token)!
 
   try {
-    const bytes = Uint8Array.from(atob(token), c => c.charCodeAt(0))
-    const decoded = cborg.decode(bytes)
-    const result = JSON.stringify(toDagJson(decoded), null, 2)
+    const decodedValue = decodeUCAN(token)
+    const result = JSON.stringify(toDagJson(decodedValue), null, 2)
     payloadCache.set(token, result)
     return result
   }
   catch (e) {
-    return `Error: ${e instanceof Error ? e.message : 'Unknown error'}`
+    return `Error decoding: ${e instanceof Error ? e.message : 'Unknown error'}`
   }
 }
 
@@ -59,11 +58,19 @@ function toDagJson(value: any): any {
   if (value instanceof Uint8Array)
     return { '/': { bytes: btoa(String.fromCharCode(...value)) } }
 
+  if (value instanceof Set)
+    return Array.from(value).map(toDagJson)
+
   if (Array.isArray(value))
     return value.map(toDagJson)
 
-  if (value !== null && typeof value === 'object')
+  if (value !== null && typeof value === 'object') {
+    // Handle IPLD links (already decoded by ucan-decoder)
+    if (value['/'] && typeof value['/'] === 'string')
+      return value // Already in DAG-JSON format from CID decoder
+
     return Object.fromEntries(Object.entries(value).map(([k, v]) => [k, toDagJson(v)]))
+  }
 
   return value
 }
