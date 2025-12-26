@@ -41,6 +41,7 @@
     "@types/node": "catalog:types",
     "@types/pako": "catalog:types",
     "@vitejs/plugin-vue": "catalog:dev",
+    "@wxt-dev/auto-icons": "catalog:dev",
     "@wxt-dev/module-vue": "catalog:dev",
     "bumpp": "catalog:cli",
     "eslint": "catalog:cli",

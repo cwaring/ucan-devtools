@@ -1,5 +1,5 @@
 browser.devtools.panels.create(
-  'UCAN',
-  'icon/128.png',
+  'UCAN Devtools',
+  'icons/32.png',
   'devtools-panel.html',
 )
