@@ -46,3 +46,7 @@ It focuses on UCAN 1.0 DAG-CBOR envelopes and supports both UCAN **delegations**
 ### Package (optional)
 - Chrome zip: `pnpm zip`
 - Firefox zip: `pnpm zip:firefox`
+
+## License
+
+[MIT](./LICENSE.md) © 2025 [Chris Waring](https://github.com/cwaring)
