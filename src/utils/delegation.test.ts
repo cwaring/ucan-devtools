@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest'
 // Mock UCAN delegation token in base64 format (CBOR-encoded)
 const MOCK_DELEGATION_TOKEN = 'glhA/ynNOVcvmCF24rmT4ZYSVVKiWmeWvOr8RTP7amuL/iyu14oi9HN1RlNkJEshYSVVqTh8YdIqbwZVFcCTU8v4BaJhaEg0Ae0B7QETcXN1Y2FuL2RsZ0AxLjAuMC1yYy4xqWNhdWR4OGRpZDprZXk6ejZNa3ViQ1ZZaFJjcUg0QkR0UDEzendWRTFTcm9xUTU2Z24xeVE1RngyZXBkTVpyY2NtZGsvZGVidWcvZWNob2NleHAaaUvqj2Npc3N4OGRpZDprZXk6ejZNa3dDak1veVJFY1ZEN1ZrN2hCTUNyY1pNWG1pZktKcEhvN2JQb3ExRUVrMk5KY25iZhpiS+f7Y3BvbIBjc3VieDhkaWQ6a2V5Ono2TWt1YkNWWWhSY3FINEJEdFAxM3p3VkUxU3JvcVE1NmduMXlRNUZ4MmVwZE1acmRtZXRhoWRub3RleDNNb2NrIGRlbGVnYXRpb24gZ2VuZXJhdGVkIGxvY2FsbHkgYnkgVUNBTiBJbnNwZWN0b3Jlbm9uY2VMQfDJBlGeGEDSiU60'
 
-describe('uCAN delegation token', () => {
+describe('ucan delegation token (UCAN)', () => {
   describe('basic structure', () => {
     it('should decode from base64', () => {
       const decoded = Buffer.from(MOCK_DELEGATION_TOKEN, 'base64')
@@ -45,7 +45,7 @@ describe('uCAN delegation token', () => {
     })
   })
 
-  describe('cbor structure', () => {
+  describe('cbor structure (CBOR)', () => {
     it('should decode as CBOR array', () => {
       const decoded = Buffer.from(MOCK_DELEGATION_TOKEN, 'base64')
       const delegation = cborg.decode(decoded)

@@ -79,7 +79,7 @@ function truncate(s: string, n = 24) {
   return s.length > n ? `${s.slice(0, n)}…` : s
 }
 
-function inspectUrl(token: string) {
+function inspectURL(token: string) {
   return `https://inspector.ucan.xyz/?ucan=${encodeURIComponent(token)}`
 }
 
@@ -179,7 +179,7 @@ onMounted(() => {
                 </TableCell>
                 <TableCell class="flex justify-end items-center gap-2">
                   <Button variant="outline" size="sm" as-child>
-                    <a :href="inspectUrl(item.token)" target="_blank">Inspect</a>
+                    <a :href="inspectURL(item.token)" target="_blank">Inspect</a>
                   </Button>
                 </TableCell>
               </TableRow>

@@ -87,7 +87,7 @@ function detectTokenType(token: string): TokenTypeInfo {
   return { type: 'unknown' }
 }
 
-function parseUcansHeader(value: string): string[] {
+function parseUCANsHeader(value: string): string[] {
   // Comma-separated list, may include spaces
   return value
     .split(',')
@@ -130,7 +130,7 @@ export function captureFromRequest(request: Browser.devtools.network.Request | H
       headerType = 'Authorization'
     }
     else if (name === 'ucans') {
-      tokens = parseUcansHeader(h.value)
+      tokens = parseUCANsHeader(h.value)
       headerType = 'ucans'
     }
 
