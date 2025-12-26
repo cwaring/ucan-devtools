@@ -209,9 +209,9 @@ describe('ucan-decoder', () => {
 
     it('should include format in error result', () => {
       // Create invalid base64 that will fail CBOR decode
-      const invalidCbor = Buffer.from([0xFF, 0xFF, 0xFF]).toString('base64')
+      const invalidCBOR = Buffer.from([0xFF, 0xFF, 0xFF]).toString('base64')
 
-      const result = safeDecodeUCAN(invalidCbor)
+      const result = safeDecodeUCAN(invalidCBOR)
 
       expect(result.success).toBe(false)
       if (!result.success) {

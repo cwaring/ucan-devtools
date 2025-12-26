@@ -1,10 +1,17 @@
 import * as cborg from 'cborg'
 import { CID } from 'multiformats/cid'
 
+import {
+  base64ToBytes,
+  base64URLToBytes,
+  bytesToBase64,
+  latin1ToBytes,
+} from './encoding'
+
 /**
  * Token encoding format
  */
-export type TokenFormat = 'base64' | 'hex' | 'raw' | 'bytes'
+export type TokenFormat = 'base64' | 'base64url' | 'hex' | 'raw' | 'bytes'
 
 /**
  * UCAN payload structure based on spec
@@ -80,18 +87,30 @@ function tokenToBytes(token: string): { bytes: Uint8Array, format: TokenFormat }
     }
   }
 
+  // Try base64URL (common for URL-safe tokens)
+  if (token.includes('-') || token.includes('_')) {
+    try {
+      return {
+        bytes: base64URLToBytes(token),
+        format: 'base64url',
+      }
+    }
+    catch {
+      // fall through
+    }
+  }
+
   // Try base64 (most common format)
   try {
-    const binaryString = atob(token)
     return {
-      bytes: Uint8Array.from(binaryString, c => c.charCodeAt(0)),
+      bytes: base64ToBytes(token),
       format: 'base64',
     }
   }
   catch {
     // Assume raw binary string as fallback
     return {
-      bytes: Uint8Array.from(token, c => c.charCodeAt(0)),
+      bytes: latin1ToBytes(token),
       format: 'raw',
     }
   }
@@ -131,7 +150,7 @@ export function decodeUCAN(token: string | Uint8Array, useCache = true): unknown
   // Generate cache key
   const cacheKey = typeof token === 'string'
     ? token
-    : btoa(String.fromCharCode(...token))
+    : bytesToBase64(token)
 
   // Check cache
   if (useCache && decodeCache.has(cacheKey)) {

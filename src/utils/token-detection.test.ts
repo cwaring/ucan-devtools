@@ -63,8 +63,8 @@ describe('token type detection', () => {
     })
 
     it('should return unknown for non-UCAN CBOR', () => {
-      const validCbor = cborg.encode({ foo: 'bar' })
-      const base64 = Buffer.from(validCbor).toString('base64')
+      const validCBOR = cborg.encode({ foo: 'bar' })
+      const base64 = Buffer.from(validCBOR).toString('base64')
       expect(detectTokenType(base64)).toEqual({ type: 'unknown' })
     })
 
