@@ -13,7 +13,7 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: ./.github/actions/setup-js
+      - uses: cwaring/ucan-devtools/.github/actions/setup-js@main
 
       - run: pnpm lint
       - run: pnpm typecheck
@@ -28,7 +28,7 @@ jobs:
       fail-fast: false
 
     steps:
-      - uses: ./.github/actions/setup-js
+      - uses: cwaring/ucan-devtools/.github/actions/setup-js@main
         with:
           node-version: ${{ matrix.node }}
 
