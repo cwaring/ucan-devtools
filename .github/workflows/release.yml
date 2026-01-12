@@ -30,9 +30,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload assets to release
-        run: |
-          for zip in ./.output/*-chrome.zip ./.output/*-firefox.zip; do
-            gh release upload ${{ github.ref_name }} "$zip"
-          done
+        run: gh release upload ${{ github.ref_name }} ./.output/*-chrome.zip ./.output/*-firefox.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
