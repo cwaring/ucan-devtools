@@ -39,7 +39,7 @@ It focuses on UCAN 1.0 DAG-CBOR envelopes and supports both UCAN **delegations**
 1. Run `pnpm build:firefox`
 2. Open `about:debugging#/runtime/this-firefox`
 3. Click **Load Temporary Add-on…**
-4. Select `.output/firefox-mv3/manifest.json`
+4. Select `.output/firefox-mv2/manifest.json`
 
 ### Dev (optional)
 - Chrome: `pnpm dev`
