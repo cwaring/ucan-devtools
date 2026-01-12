@@ -26,10 +26,12 @@ jobs:
           pnpm zip:firefox
 
       - name: Generate GitHub Release with Changelog
+        run: pnpx changelogithub
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload assets to release
         run: |
-          pnpx changelogithub
-          gh release upload ${{ github.ref_name }} \
-            ./.output/*-chrome.zip#"UCAN Devtools - Chrome Ext" \
-            ./.output/*-firefox.zip#"UCAN Devtools - Firefox Ext"
+          gh release upload ${{ github.ref_name }} ./.output/*-chrome.zip ./.output/*-firefox.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
