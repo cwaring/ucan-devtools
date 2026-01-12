@@ -22,8 +22,7 @@ jobs:
 
       - name: Build extensions
         run: |
-          pnpm zip
-          pnpm zip:firefox
+          pnpm "/^zip:?/"
 
       - name: Generate GitHub Release with Changelog
         run: pnpx changelogithub
@@ -32,7 +31,7 @@ jobs:
 
       - name: Upload assets to release
         run: |
-          for zip in ./.output/*.zip; do
+          for zip in ./.output/*-chrome.zip ./.output/*-firefox.zip; do
             gh release upload ${{ github.ref_name }} "$zip"
           done
         env:
