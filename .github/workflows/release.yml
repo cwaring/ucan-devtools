@@ -17,6 +17,8 @@ jobs:
     steps:
       - name: Setup JS
         uses: cwaring/ucan-devtools/.github/actions/setup-js@main
+        with:
+          fetch-depth: 0
 
       - name: Build extensions
         run: |

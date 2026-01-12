@@ -14,12 +14,18 @@ inputs:
     description: Use frozen lockfile for installation
     required: false
     default: 'true'
+  fetch-depth:
+    description: Number of commits to fetch (0 for full history)
+    required: false
+    default: '1'
 
 runs:
   using: composite
   steps:
     - name: Checkout repository
       uses: actions/checkout@v4
+      with:
+        fetch-depth: ${{ inputs.fetch-depth }}
 
     - name: Setup pnpm
       uses: pnpm/action-setup@v4
