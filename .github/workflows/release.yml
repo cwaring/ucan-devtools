@@ -16,9 +16,9 @@ jobs:
 
     steps:
       - name: Setup JS
-        uses: cwaring/ucan-devtools/.github/actions/setup-js@main
+        uses: sxzz/workflows/setup-js@v1
         with:
-          fetch-depth: 0
+          fetch-all: true
 
       - name: Build extensions
         run: |

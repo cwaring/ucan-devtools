@@ -10,27 +10,7 @@ on:
       - main
 
 jobs:
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: cwaring/ucan-devtools/.github/actions/setup-js@main
-
-      - run: pnpm lint
-      - run: pnpm typecheck
-
-  test:
-    runs-on: ${{ matrix.os }}
-
-    strategy:
-      matrix:
-        node: [lts/*]
-        os: [ubuntu-latest, windows-latest, macos-latest]
-      fail-fast: false
-
-    steps:
-      - uses: cwaring/ucan-devtools/.github/actions/setup-js@main
-        with:
-          node-version: ${{ matrix.node }}
-
-      - run: pnpm test
-      - run: pnpm "/^build:?/"
+  unit-test:
+    uses: sxzz/workflows/.github/workflows/unit-test.yml@v1
+    with:
+      build: pnpm "/^build:?/"
