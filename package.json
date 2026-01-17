@@ -1,7 +1,7 @@
 {
   "name": "ucan-devtools",
   "type": "module",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "private": true,
   "packageManager": "pnpm@10.28.0",
   "description": "UCAN Devtools - A universal browser extension for inspecting and debugging UCANs",
