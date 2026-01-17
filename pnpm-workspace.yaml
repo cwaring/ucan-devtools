@@ -8,7 +8,7 @@ trustPolicy: no-downgrade
 catalogs:
   cli:
     '@antfu/eslint-config': ^6.7.3
-    '@antfu/ni': ^28.1.0
+    '@antfu/ni': ^28.2.0
     bumpp: ^10.4.0
     eslint: ^9.39.2
     lint-staged: ^16.2.7
@@ -40,7 +40,7 @@ catalogs:
     vitest: ^4.0.17
     yaml: ^2.8.2
   types:
-    '@types/node': ^25.0.8
+    '@types/node': ^25.0.9
     '@types/pako': ^2.0.4
     multiformats: ^13.4.2
 ignoredBuiltDependencies:
