@@ -27,14 +27,14 @@ catalogs:
     wxt: ^0.20.13
   frontend:
     '@vueuse/core': ^14.1.0
-    cborg: ^4.3.2
+    cborg: ^4.4.1
     class-variance-authority: ^0.7.1
     clsx: ^2.1.1
     lucide-vue-next: ^0.562.0
     pako: ^2.1.0
     reka-ui: ^2.7.0
     tailwind-merge: ^3.4.0
-    vue: ^3.5.26
+    vue: ^3.5.27
   testing:
     tinyexec: ^1.0.2
     vitest: ^4.0.17
