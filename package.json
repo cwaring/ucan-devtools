@@ -5,6 +5,7 @@
   "private": true,
   "packageManager": "pnpm@10.28.1",
   "description": "UCAN Devtools - A universal browser extension for inspecting and debugging UCANs",
+  "license": "MIT OR Apache-2.0",
   "scripts": {
     "dev": "wxt",
     "dev:firefox": "wxt -b firefox",
