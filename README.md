@@ -4,12 +4,13 @@
 
 UCAN Devtools is a browser extension that adds a DevTools panel for inspecting and debugging UCANs found in browser traffic (for example UCANs carried in request headers).
 
-It supports UCAN 1.0 (DAG-CBOR envelopes) including both UCAN **delegations** and **invocations**, as well as [UCAN containers (ctn-v1)](https://github.com/ucan-wg/container).
+It supports UCAN 1.0 (DAG-CBOR envelopes) including both UCAN **delegations** and **invocations**, and UCAN **containers** (ctn-v1).
 
 **Relevant specs**
 - [UCAN core spec](https://github.com/ucan-wg/spec)
 - [Delegation payload](https://github.com/ucan-wg/delegation)
 - [Invocation payload](https://github.com/ucan-wg/invocation)
+- [UCAN container spec](https://github.com/ucan-wg/container)
 - [UCAN HTTP Bearer Token](https://github.com/ucan-wg/ucan-http-bearer-token)
 
 ## Installation
