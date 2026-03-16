@@ -8,6 +8,8 @@ import type {
   UCANTypeTag,
 } from './ucan-types'
 
+const UCAN_TYPE_KEY_RE = /^ucan\/(?:dlg|inv)@/i
+
 function isRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === 'object'
 }
@@ -108,7 +110,7 @@ export function getUCANPayloadFromEnvelope(
     if (!key.startsWith('ucan/'))
       continue
 
-    if (!/^ucan\/(?:dlg|inv)@/i.test(key))
+    if (!UCAN_TYPE_KEY_RE.test(key))
       continue
 
     if (key.toLowerCase().startsWith('ucan/dlg@')) {

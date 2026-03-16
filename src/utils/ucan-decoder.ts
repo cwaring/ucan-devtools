@@ -33,6 +33,7 @@ export class UCANDecodeError extends Error {
  * Decode cache for performance optimization
  */
 const decodeCache = new Map<string, unknown>()
+const HEX_PATTERN = /^[0-9a-f]+$/i
 
 /**
  * Converts a token string in various formats to Uint8Array
@@ -40,8 +41,7 @@ const decodeCache = new Map<string, unknown>()
  */
 function tokenToBytes(token: string): { bytes: Uint8Array, format: TokenFormat } {
   // Check if it's valid hex first (before base64, since some hex is valid base64)
-  const hexPattern = /^[0-9a-f]+$/i
-  if (hexPattern.test(token) && token.length % 2 === 0 && token.length >= 4) {
+  if (HEX_PATTERN.test(token) && token.length % 2 === 0 && token.length >= 4) {
     // Likely hex if it's all hex chars and even length
     const bytes = new Uint8Array(token.length / 2)
     for (let i = 0; i < token.length; i += 2) {

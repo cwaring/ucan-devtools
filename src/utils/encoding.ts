@@ -1,3 +1,9 @@
+const BASE64_URL_DASH_RE = /-/g
+const BASE64_URL_UNDERSCORE_RE = /_/g
+const BASE64_PLUS_RE = /\+/g
+const BASE64_SLASH_RE = /\//g
+const BASE64_PADDING_RE = /=+$/g
+
 export function latin1ToBytes(input: string): Uint8Array {
   const bytes = new Uint8Array(input.length)
   for (let i = 0; i < input.length; i++) bytes[i] = input.charCodeAt(i) & 0xFF
@@ -33,7 +39,7 @@ export function bytesToBase64(bytes: Uint8Array): string {
 
 export function base64URLToBytes(input: string): Uint8Array {
   // Convert base64URL (no padding) to standard base64
-  let s = input.replace(/-/g, '+').replace(/_/g, '/')
+  let s = input.replace(BASE64_URL_DASH_RE, '+').replace(BASE64_URL_UNDERSCORE_RE, '/')
   const pad = s.length % 4
   if (pad === 2)
     s += '=='
@@ -47,5 +53,5 @@ export function base64URLToBytes(input: string): Uint8Array {
 
 export function bytesToBase64URL(bytes: Uint8Array): string {
   const std = bytesToBase64(bytes)
-  return std.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '')
+  return std.replace(BASE64_PLUS_RE, '-').replace(BASE64_SLASH_RE, '_').replace(BASE64_PADDING_RE, '')
 }

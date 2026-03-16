@@ -59,7 +59,7 @@ function toDagJson(value: any): any {
     return { '/': { bytes: btoa(String.fromCharCode(...value)) } }
 
   if (value instanceof Set)
-    return Array.from(value).map(toDagJson)
+    return Array.from(value, toDagJson)
 
   if (Array.isArray(value))
     return value.map(toDagJson)
