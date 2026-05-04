@@ -1,3 +1,4 @@
+import type { DecodeOptions, TagDecoder } from 'cborg'
 import type { DecodeResult, TokenFormat } from './ucan-types'
 
 import * as cborg from 'cborg'
@@ -91,21 +92,31 @@ function tokenToBytes(token: string): { bytes: Uint8Array, format: TokenFormat }
  * IPLD CBOR tag handlers
  * @see https://github.com/multiformats/multicodec/blob/master/table.csv
  */
-const IPLD_TAGS = {
+const decodeCIDTag: TagDecoder = (decode) => {
+  const value = decode()
+  const bytes = value instanceof Uint8Array ? value : new Uint8Array(0)
+
+  try {
+    // Decode CID and convert to string (e.g., "bafyrei...")
+    const cid = CID.decode(bytes)
+    return { '/': cid.toString() }
+  }
+  catch {
+    // Fallback to raw bytes if CID decoding fails
+    return { '/': bytes }
+  }
+}
+
+const decodeSetTag: TagDecoder = (decode) => {
+  const value = decode()
+  return new Set(Array.isArray(value) ? value : [value])
+}
+
+const IPLD_TAGS: NonNullable<DecodeOptions['tags']> = {
   // Tag 42: CID (Content Identifier) - IPLD link
-  42: (bytes: Uint8Array) => {
-    try {
-      // Decode CID and convert to string (e.g., "bafyrei...")
-      const cid = CID.decode(bytes)
-      return { '/': cid.toString() }
-    }
-    catch {
-      // Fallback to raw bytes if CID decoding fails
-      return { '/': bytes }
-    }
-  },
+  42: decodeCIDTag,
   // Tag 258: Set (used in some IPLD schemas)
-  258: (arr: unknown[]) => new Set(arr),
+  258: decodeSetTag,
 } as const
 
 /**
@@ -142,7 +153,6 @@ export function decodeUCAN(token: string | Uint8Array, useCache = true): unknown
     }
 
     const decoded = cborg.decode(bytes, {
-      // @ts-expect-error - cborg has tag handlers but TypeScript doesn't expose them fully
       tags: IPLD_TAGS,
     })
 
