@@ -1,3 +1,4 @@
+import type { WxtViteConfig } from 'wxt'
 import tailwindcss from '@tailwindcss/vite'
 import { defineConfig } from 'wxt'
 
@@ -11,8 +12,8 @@ export default defineConfig({
     baseIconPath: 'assets/ucan.svg',
   },
   srcDir: 'src',
-  vite: _env => ({
-    plugins: [tailwindcss()],
+  vite: (_env): WxtViteConfig => ({
+    plugins: [tailwindcss()] as WxtViteConfig['plugins'],
   }),
   webExt: {
     binaries: {
