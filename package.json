@@ -3,7 +3,7 @@
   "type": "module",
   "version": "0.3.1",
   "private": true,
-  "packageManager": "pnpm@11.0.8",
+  "packageManager": "pnpm@11.0.9",
   "description": "UCAN Devtools - A universal browser extension for inspecting and debugging UCANs",
   "license": "MIT OR Apache-2.0",
   "scripts": {
