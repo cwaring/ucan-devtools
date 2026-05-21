@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { TokenItem } from './capture'
-import { RotateCcw } from 'lucide-vue-next'
+import { RotateCcw } from '@lucide/vue'
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'

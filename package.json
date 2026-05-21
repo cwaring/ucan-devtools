@@ -3,7 +3,7 @@
   "type": "module",
   "version": "0.3.2",
   "private": true,
-  "packageManager": "pnpm@11.0.9",
+  "packageManager": "pnpm@11.2.1",
   "description": "UCAN Devtools - A universal browser extension for inspecting and debugging UCANs",
   "license": "MIT OR Apache-2.0",
   "scripts": {
@@ -24,11 +24,11 @@
     "playground:build": "vite build --config vite.playground.config.ts"
   },
   "dependencies": {
+    "@lucide/vue": "catalog:frontend",
     "@vueuse/core": "catalog:frontend",
     "cborg": "catalog:frontend",
     "class-variance-authority": "catalog:frontend",
     "clsx": "catalog:frontend",
-    "lucide-vue-next": "catalog:frontend",
     "multiformats": "catalog:types",
     "pako": "catalog:frontend",
     "reka-ui": "catalog:frontend",
